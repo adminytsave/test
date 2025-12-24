@@ -22,8 +22,8 @@ RUN apt-get update && apt-get install -y \
 RUN locale-gen en_US.UTF-8
 RUN update-locale LANG=en_US.UTF-8
 
-# Install Tailscale
-RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu_$(lsb_release -rs).deb -o tailscale.deb \
+# Install Tailscale dengan URL yang lebih aman
+RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal_amd64.deb -o tailscale.deb \
     && dpkg -i tailscale.deb \
     && apt-get install -f -y \
     && rm -f tailscale.deb
