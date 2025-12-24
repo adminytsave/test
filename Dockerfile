@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
     bash \
     iproute2 \
     iputils-ping \
+    iptables \
     && rm -rf /var/lib/apt/lists/*
 
 # Set locale
@@ -48,6 +49,9 @@ EXPOSE 3389
 # Gunakan skrip untuk menjalankan Tailscale dan XRDP agar sinyal diteruskan dengan benar
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
+# Buat TUN device jika tidak ada
+RUN mkdir -p /dev/net && mknod /dev/net/tun c 10 200 && chmod 600 /dev/net/tun
 
 # Jalankan XRDP sebagai foreground process
 CMD ["bash", "-c", "/entrypoint.sh && xrdp -nodaemon"]
