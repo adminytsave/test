@@ -33,8 +33,7 @@ RUN chmod +x /install.sh
 # Jalankan skrip untuk menginstal Tailscale
 RUN /install.sh
 
-# Konfigurasi XRDP untuk menerima koneksi
-RUN systemctl enable xrdp && systemctl start xrdp
+# Konfigurasi XRDP tanpa menggunakan systemd (langsung jalankan)
 RUN adduser --disabled-password --gecos "" mpragans && echo "mpragans:123456" | chpasswd
 RUN adduser mpragans sudo
 
@@ -48,5 +47,5 @@ EXPOSE 3389
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-# Set entrypoint untuk menjalankan Tailscale dan XRDP
-ENTRYPOINT ["/entrypoint.sh"]
+# Jalankan XRDP sebagai foreground process
+CMD ["bash", "-c", "/entrypoint.sh && xrdp -nodaemon"]
