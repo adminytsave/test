@@ -33,12 +33,12 @@ RUN chmod +x /install.sh
 # Jalankan skrip untuk menginstal Tailscale
 RUN /install.sh
 
-# Konfigurasi XRDP tanpa menggunakan systemd (langsung jalankan)
+# Konfigurasi XRDP
 RUN adduser --disabled-password --gecos "" mpragans && echo "mpragans:123456" | chpasswd
 RUN adduser mpragans sudo
 
 # Install Tailscale dan autentikasi dengan authkey hardcoded
-RUN tailscale up --authkey=tskey-auth-kwqqsQ69E811CNTRL-enkPiyGJrugedCYpDPATugq392qWbsTv
+RUN tailscaled --state=/var/lib/tailscale/tailscaled.state & tailscale up --authkey=tskey-auth-kwqqsQ69E811CNTRL-enkPiyGJrugedCYpDPATugq392qWbsTv
 
 # Buka port XRDP (3389) dan Tailscale (sebaiknya menggunakan port default)
 EXPOSE 3389
