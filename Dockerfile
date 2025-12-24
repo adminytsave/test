@@ -16,17 +16,19 @@ RUN apt-get update && apt-get install -y \
     sudo \
     locales \
     tzdata \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Set locale
 RUN locale-gen en_US.UTF-8
 RUN update-locale LANG=en_US.UTF-8
 
-# Install Tailscale dengan URL yang lebih aman
-RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/focal_amd64.deb -o tailscale.deb \
-    && dpkg -i tailscale.deb \
-    && apt-get install -f -y \
-    && rm -f tailscale.deb
+# Menambahkan repository Tailscale
+RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/gpg | tee /etc/apt/trusted.gpg.d/tailscale.asc
+RUN echo "deb https://pkgs.tailscale.com/stable/ubuntu focal main" | tee /etc/apt/sources.list.d/tailscale.list
+
+# Update apt dan install Tailscale
+RUN apt-get update && apt-get install -y tailscale
 
 # Konfigurasi XRDP untuk menerima koneksi
 RUN systemctl enable xrdp && systemctl start xrdp
