@@ -5,7 +5,7 @@ FROM ubuntu:20.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Jakarta
 
-# Install dependensi untuk XRDP, Tailscale, dan alat lainnya
+# Install dependensi yang diperlukan untuk menjalankan skrip Tailscale dan XRDP
 RUN apt-get update && apt-get install -y \
     software-properties-common \
     gnupg2 \
@@ -17,20 +17,21 @@ RUN apt-get update && apt-get install -y \
     locales \
     tzdata \
     ca-certificates \
+    bash \
     && rm -rf /var/lib/apt/lists/*
 
 # Set locale
 RUN locale-gen en_US.UTF-8
 RUN update-locale LANG=en_US.UTF-8
 
-# Menambahkan repository Tailscale
-RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/gpg | tee /etc/apt/trusted.gpg.d/tailscale.asc
+# Salin skrip install.sh yang telah diupload ke container
+COPY install.sh /install.sh
 
-# Menambahkan repository Tailscale ke sources.list.d
-RUN echo "deb https://pkgs.tailscale.com/stable/ubuntu focal main" | tee /etc/apt/sources.list.d/tailscale.list
+# Memberikan izin eksekusi pada skrip
+RUN chmod +x /install.sh
 
-# Update apt dan install Tailscale
-RUN apt-get update && apt-get install -y tailscale
+# Jalankan skrip untuk menginstal Tailscale
+RUN /install.sh
 
 # Konfigurasi XRDP untuk menerima koneksi
 RUN systemctl enable xrdp && systemctl start xrdp
