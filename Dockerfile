@@ -25,6 +25,8 @@ RUN update-locale LANG=en_US.UTF-8
 
 # Menambahkan repository Tailscale
 RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/gpg | tee /etc/apt/trusted.gpg.d/tailscale.asc
+
+# Menambahkan repository Tailscale ke sources.list.d
 RUN echo "deb https://pkgs.tailscale.com/stable/ubuntu focal main" | tee /etc/apt/sources.list.d/tailscale.list
 
 # Update apt dan install Tailscale
