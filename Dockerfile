@@ -1,6 +1,10 @@
 # Gunakan image Ubuntu sebagai dasar
 FROM ubuntu:20.04
 
+# Set environment variables untuk locale dan timezone
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Jakarta
+
 # Install dependensi untuk XRDP, Tailscale, dan alat lainnya
 RUN apt-get update && apt-get install -y \
     software-properties-common \
@@ -10,7 +14,13 @@ RUN apt-get update && apt-get install -y \
     apt-transport-https \
     xrdp \
     sudo \
+    locales \
+    tzdata \
     && rm -rf /var/lib/apt/lists/*
+
+# Set locale
+RUN locale-gen en_US.UTF-8
+RUN update-locale LANG=en_US.UTF-8
 
 # Install Tailscale
 RUN curl -fsSL https://pkgs.tailscale.com/stable/ubuntu_$(lsb_release -rs).deb -o tailscale.deb \
@@ -29,5 +39,9 @@ RUN tailscale up --authkey=tskey-auth-kwqqsQ69E811CNTRL-enkPiyGJrugedCYpDPATugq3
 # Buka port XRDP (3389) dan Tailscale (sebaiknya menggunakan port default)
 EXPOSE 3389
 
-# Set Tailscale untuk mengaktifkan koneksi secara otomatis saat container dimulai
-CMD tailscale up && xrdp -nodaemon
+# Gunakan skrip untuk menjalankan Tailscale dan XRDP agar sinyal diteruskan dengan benar
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Set entrypoint untuk menjalankan Tailscale dan XRDP
+ENTRYPOINT ["/entrypoint.sh"]
